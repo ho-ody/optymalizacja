@@ -75,21 +75,16 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-		solution Xopt;
-		
 		solution A(a), B(b), C((a + b) / 2), D(0.);
 		matrix l, m;
-		while (1) {
-			A.fit_fun(ff); //fit_fun() oblicza funkcje w celu
+		while (0x1) {
+			A.fit_fun(ff);
 			B.fit_fun(ff);
 			C.fit_fun(ff);
 			l = A.y * (pow(B.x, 2) - pow(C.x,2)) + B.y * (pow(C.x,2)-pow(A.x,2)) + C.y*(pow(A.x,2)-pow(B.x,2));
 			m = A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x);
-			if (m <= 0) {
-				C.x = NAN;
-				C.y = NAN;
-				return C;
-			}
+			if (m <= 0)
+				return solution();
 			D.x = 0.5 * l / m;
 			D.fit_fun(ff);
 			if (A.x < C.x && C.x < D.x) {
@@ -97,32 +92,25 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 					A = C;
 					C = D;
 				}
-				else {
+				else
 					B = D;
-				}
 			}
 			else if (A.x < D.x && D.x < C.x) {
 				if (D.y > C.y) {
 					B = C;
 					C = D;
 				}
-				else {
+				else
 					A = D;
-				}
 			}
-			else {
-				C.x = NAN;
-				C.y = NAN;
-				return C;
-			}
+			else
+				return solution();
+
 			if (Nmax <= D.f_calls - 3 || A.x - B.x < epsilon || (D.x - C.x > -gamma && D.x - C.x < gamma)) {
 				C.fit_fun(ff);
 				return C;
 			}
 		}
-
-
-		return Xopt;
 	}
 	catch (string ex_info)
 	{

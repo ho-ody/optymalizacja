@@ -37,27 +37,80 @@ int main()
 using namespace std;
 
 matrix f1(matrix x, matrix ud1, matrix ud2) {
+	double y = -cos(0.1 * x()) * exp(-pow(0.1 * x() - 2 * 3.14, 2)) + 0.002 * pow(0.1 * x(), 2);
+	return matrix(y);
+}
+matrix f1_old(matrix x, matrix ud1, matrix ud2) {
 	double y = -cos(0.1 * x()) * exp(-pow(0.1 * x() - 2 * M_PI, 2)) + 0.002 * pow(0.1 * x(), 2);
 	return matrix(y);
 }
+void lab1_rzeczywiste();
 void lab1() {
+	lab1_rzeczywiste();
+	return;
 	//input data
-	double x0		= -100;
+	double x0		= 10;
 	double d		= 1;
 	double alpha	= 2;
 	double epsilon	= 1e-5;
 	double gamma	= 1e-5;
-	double Nmax		= 10009;
+	double Nmax		= 1000;
 
 	//calculations
 	double* ab_range = expansion(f1, x0, d, alpha, Nmax);
 	double a = *ab_range, b = *++ab_range;
 	cerr << "expansion -> [" << a << "," << b << "]\n";
+	a = -10; b = 1;
+	epsilon = 0.0001;
+	gamma = 1e-7;
 	double fib_v = m2d(fib(f1, a, b, epsilon).x);
 	cerr << "fibonacci -> " << fib_v << endl;
 	double lag_v = m2d(lag(f1, a, b, epsilon, gamma, Nmax).x);
 	cerr << "lagrange  -> " << lag_v << endl;
 }
+
+matrix df1(double t, matrix Y, matrix ud1, matrix ud2) {
+	
+	double a = 0.98, b = 0.63, g = 9.81, VA = 5, PA = 0.75, DB = 36.5665, VB = 1, PB = 1, Fin = 0.01, Tin = 10, TA = 90;
+	matrix dY(3, 1);
+	
+	double FAout = a * b * m2d(ud2) * sqrt(2 * g * Y(1) / PA);
+	double FBout = a * b * DB * sqrt(2 * g * Y(2) / PB);
+
+	dY(0) = -1. * FAout;
+	dY(1) = FAout + Fin - FBout;
+	dY(2) = Fin / Y(1) * (Tin - Y(2)) + FAout / Y(1) * (TA-Y(2));
+	
+	return dY;
+}
+matrix fR(matrix x, matrix ud1, matrix ud2) {
+	matrix y;
+	matrix Y0 = matrix(3, new double[3]{ 5,1,10 });
+	matrix* Y = solve_ode(df1,0,1,1000,Y0,ud1,x);
+
+	double max_ = -999999999999;
+	for (int i = 0; i < get_len(Y[1])-1; i++) {
+		if (Y[1](i,2) > max_) {
+			max_ = Y[1](i, 2);
+		}
+	}
+	y = abs(max_ - 50);
+
+	return y;
+}
+
+void lab1_rzeczywiste() {
+
+	double a = 1, b = 100, epsilon = 1e-5;
+
+	//fib(fR, a, b, epsilon);
+	double fib_v = m2d(fib(fR, a, b, epsilon).x);
+	cerr << fib_v << endl;
+
+
+
+}
+
 
 void lab2() {
 

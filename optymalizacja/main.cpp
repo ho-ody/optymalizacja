@@ -46,6 +46,7 @@ matrix f1_old(matrix x, matrix ud1, matrix ud2) {
 }
 void lab1_rzeczywiste();
 void testowa_f_celu_a();
+void problem_rzeczy_b();
 void print_sol(solution in) {
 	cerr << "\tx =       " << m2d(in.x) << endl;
 	cerr << "\ty =       " << m2d(in.y) << endl;
@@ -59,7 +60,8 @@ void reset_calls() {
 
 void lab1() {
 	//lab1_rzeczywiste();
-	testowa_f_celu_a();
+	//testowa_f_celu_a();
+	problem_rzeczy_b();
 	return;
 	//input data
 	double x0		= 10;
@@ -89,12 +91,12 @@ void lab1() {
 	cerr << "lagrange  -> " << endl;
 	print_sol(temp);
 }
-
+int sfadf = 0;
 matrix df1(double t, matrix Y, matrix ud1, matrix ud2) {
 	
 	//double a = 0.98, b = 0.63, g = 9.81, VA = 5, PA = 0.75, DB = 36.5665, VB = 1, PB = 1, Fin = 0.01, Tin = 10, TA = 90;
 	//double a = 0.98, b = 0.63, g = 9.81, PA = 1, TA = 90, PB = 1, DB = 0.00365665, Fin = 0.01, Tin = 10, DA = ud2();
-	double a = 0.98, b = 0.63, g = 9.81, PA = 0.75, TA = 90, PB = 1, DB = 36.5665, Fin = 0.01, Tin = 10, DA = ud2();
+	double a = 0.98, b = 0.63, g = 9.81, PA = 0.75, TA = 90, PB = 1, DB = 0.00365665, Fin = 0.01, Tin = 10, DA = ud2();
 
 
 	matrix dY(3, 1);
@@ -106,10 +108,13 @@ matrix df1(double t, matrix Y, matrix ud1, matrix ud2) {
 	if (Y(1) <= 0)
 		FBout = 0;
 
+	sfadf++;
 	dY(0) = -FAout;
 	dY(1) = FAout + Fin - FBout;
 	dY(2) = Fin / Y(1) * (Tin - Y(2)) + FAout / Y(1) * (TA-Y(2));
 	
+	//cerr << dY(0) << dY(1) << dY(2) << endl;
+
 	return dY;
 }
 matrix fR(matrix x, matrix ud1, matrix ud2) {
@@ -119,6 +124,12 @@ matrix fR(matrix x, matrix ud1, matrix ud2) {
 	matrix* Y = solve_ode(df1,0,1,1000,Y0,ud1,x);
 
 	double max_ = Y[1](0.2);
+
+	//zapis -> symulacja
+	ofstream file; file.open("sym.csv");
+	file << Y[1];
+	file.close();
+	//==
 
 	for (int i = 1; i < get_len(Y[0]); i++) {
 		if (max_ < Y[1](i, 2))
@@ -196,6 +207,20 @@ void testowa_f_celu_a() {
 	}
 
 
+
+}
+void problem_rzeczy_b() {
+	double x0, d = 1, epsilon = 1e-4, gamma = 1e-6, Nmax = 1000, alpha = 2;
+
+
+	solution opt_F = fib(fR, 0.0001, 0.01, epsilon);
+	cerr << "fib->\n" << opt_F << endl << endl;
+	//solution::clear_calls();
+
+	//solution opt_L = lag(fR, 0.0001, 0.01, epsilon, gamma, Nmax);
+	//cerr << "lag->\n" << opt_L << endl << endl;
+
+	
 
 }
 

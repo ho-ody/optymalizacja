@@ -67,7 +67,6 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		D.fit_fun(ff, ud1, ud2);
 		for (int i = 0; i <= n - 3; ++i)
 		{
-			cerr << B.x - A.x << endl;
 			if (C.y < D.y)
 				//B.x = D.x;
 				B = D;
@@ -231,7 +230,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	double l, m;
 	while (true)
 	{
-		cerr << B.x- A.x << endl;
 		l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y * (pow(A.x) - pow(B.x)));
 		m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
 		if (m <= 0)

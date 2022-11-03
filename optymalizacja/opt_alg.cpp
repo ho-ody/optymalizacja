@@ -68,18 +68,13 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		for (int i = 0; i <= n - 3; ++i)
 		{
 			if (C.y < D.y)
-				//B.x = D.x;
 				B = D;
 			else
-				//A.x = C.x;
 				A = C;
 			C.x = B.x - 1.0 * F[n - i - 2] / F[n - i - 1] * (B.x - A.x);
 			D.x = A.x + B.x - C.x;
 			C.fit_fun(ff, ud1, ud2);
 			D.fit_fun(ff, ud1, ud2);
-
-			
-
 		}
 		Xopt = C;
 		Xopt.flag = 0;
@@ -95,131 +90,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-		/*
-		solution Xopt;
-		Xopt.ud = b - a;
-		solution A(a), B(b), C, D, D_old(a);
-		C.x = (a + b) / 2;
-		A.fit_fun(ff, ud1, ud2);
-		B.fit_fun(ff, ud1, ud2);
-		C.fit_fun(ff, ud1, ud2);
-		double l, m;
-		while (true)
-		{
-			//l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y * (pow(A.x) - pow(B.x)));
-			//m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
-			l = A.y(0) * (pow(B.x(0), 2) - pow(C.x(0), 2)) + B.y(0) * (pow(C.x(0), 2)
-				- pow(A.x(0), 2)) + C.y(0) * (pow(A.x(0), 2) - pow(B.x(0), 2));
-			m = A.y(0) * (B.x(0) - C.x(0)) + B.y(0) * (C.x(0) - A.x(0)) + C.y(0) *
-				(A.x(0) - B.x(0));
-
-			if (m <= 0)
-			{
-				Xopt = D_old;
-				Xopt.x = NAN;
-				Xopt.y = NAN;
-				Xopt.flag = 3;
-				return Xopt;
-			}
-			D.x = 0.5 * l / m;
-			D.fit_fun(ff, ud1, ud2);
-			if (A.x <= D.x && D.x <= C.x)
-			{
-				if (D.y < C.y) {
-					B = C;
-					C = D;
-				}
-				else
-					A = D;
-			}
-			else if (C.x <= D.x && D.x <= B.x)
-			{
-				if (D.y < C.y) {
-					A = C;
-					C = D;
-				}
-				else
-					B = D;
-			}
-			else
-			{
-				Xopt = D_old;
-				Xopt.flag = 2;
-				Xopt.x = NAN;
-				Xopt.y = NAN;
-				return Xopt;
-			}
-			Xopt.ud.add_row((B.x - A.x)());
-			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
-			{
-				Xopt = C;
-				Xopt.flag = 0;
-				break;
-			}
-			if (solution::f_calls > Nmax)
-			{
-				Xopt = C;
-				Xopt.flag = 1;
-				break;
-			}
-			D_old = D;
-		}
-		return Xopt;
-		*/
-		/*
-			solution A(a), B(b), C, D, D_old(a);
-			C.x = (a + b) / 2;
-			A.fit_fun(ff);
-			B.fit_fun(ff);
-			C.fit_fun(ff);
-			double l, m;
-			while (true)
-			{
-				l = A.y(0) * (pow(B.x(0), 2) - pow(C.x(0), 2)) + B.y(0) * (pow(C.x(0), 2)
-					- pow(A.x(0), 2)) + C.y(0) * (pow(A.x(0), 2) - pow(B.x(0), 2));
-				m = A.y(0) * (B.x(0) - C.x(0)) + B.y(0) * (C.x(0) - A.x(0)) + C.y(0) *
-					(A.x(0) - B.x(0));
-				if (m <= 0)
-				{
-					C.x = NAN;
-					C.y = NAN;
-					return C;
-				}
-				D.x = 0.5 * (l / m);
-				D.fit_fun(ff);
-				if (A.x <= D.x && D.x <= C.x)
-				{
-					if (D.y < C.y)
-					{
-						B = C;
-						C = D;
-					}
-					else
-						A = D;
-				}
-				else if (C.x <= D.x && D.x <= B.x)
-				{
-					if (D.y < C.y)
-					{
-						A = C;
-						C = D;
-					}
-					else
-						B = D;
-				}
-				else
-				{
-					C.x = NAN;
-					C.y = NAN;
-					return C;
-				}
-				if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma ||
-					solution::f_calls > Nmax)
-					return C;
-				D_old = D;
-		}
-			*/
-		//magda's
 	solution Xopt;
 	Xopt.ud = b - a;
 	solution A(a), B(b), C, D, D_old(a);
@@ -248,9 +118,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 				C = D;
 			}
 			else
-			{
 				A = D;
-			}
 		}
 		else if (C.x <= D.x && D.x <= B.x)
 		{
@@ -260,9 +128,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 				C = D;
 			}
 			else
-			{
 				B = D;
-			}
 		}
 		else
 		{

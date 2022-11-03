@@ -40,80 +40,52 @@ matrix f1(matrix x, matrix ud1, matrix ud2) {
 	double y = -cos(0.1 * x()) * exp(-pow(0.1 * x() - 2 * 3.14, 2)) + 0.002 * pow(0.1 * x(), 2);
 	return matrix(y);
 }
-matrix f1_old(matrix x, matrix ud1, matrix ud2) {
-	double y = -cos(0.1 * x()) * exp(-pow(0.1 * x() - 2 * M_PI, 2)) + 0.002 * pow(0.1 * x(), 2);
-	return matrix(y);
-}
-void lab1_rzeczywiste();
 void testowa_f_celu_a();
 void problem_rzeczy_b();
-void print_sol(solution in) {
-	cerr << "\tx =       " << m2d(in.x) << endl;
-	cerr << "\ty =       " << m2d(in.y) << endl;
-	cerr << "\tf_calls = " << solution::f_calls << endl;
-}
-void reset_calls() {
-	solution::f_calls = 0;
-	solution::g_calls = 0;
-	solution::H_calls = 0;
-}
-
+void test_zbiez_metod();
 void lab1() {
-	//lab1_rzeczywiste();
-	//testowa_f_celu_a();
-	problem_rzeczy_b();
-	return;
+	//test_zbiez_metod();	//spradzanie poprawnosci obliczen metody fibbonaciego i lagrangea
+	//testowa_f_celu_a();	//rozwi¹zanie dla funkcji testowej, punkt 5.a. z pdf'a
+	problem_rzeczy_b();		//rozwi¹zanie dla przypadku rzeczywistego, punkt 5.b. z pdf'a
+}
+void test_zbiez_metod() {
 	//input data
-	double x0		= 10;
-	double d		= 1;
-	double alpha	= 1.5;
-	double epsilon	= 1e-5;
-	double gamma	= 1e-5;
-	double Nmax		= 1000;
+	double x0 = 10;
+	double d = 1;
+	double alpha = 1.5;
+	double epsilon = 1e-5;
+	double gamma = 1e-5;
+	double Nmax = 1000;
 
 	//calculations
 	double* ab_range = expansion(f1, x0, d, alpha, Nmax);
 	double a = *ab_range, b = *++ab_range;
 	cerr << "expansion -> [" << a << "," << b << "]\n";
-	
-	
+
 	a = -10; b = 1;
 	epsilon = 0.0001;
 	gamma = 1e-7;
-	reset_calls();
-	solution temp = fib(f1, a, b, epsilon);
+	solution::clear_calls();
 
-	cerr << "fibonacci -> " << endl;
-	print_sol(temp);
+	solution fib_ = fib(f1, a, b, epsilon);
+	cerr << "fibonacci -> \n" << fib_;
+	solution::clear_calls();
 
-	reset_calls();
-	temp =lag(f1, a, b, epsilon, gamma, Nmax);
-	cerr << "lagrange  -> " << endl;
-	print_sol(temp);
+	solution lag_ = lag(f1, a, b, epsilon, gamma, Nmax);
+	cerr << "lagrange  -> \n" << lag_;
 }
-int sfadf = 0;
+
 matrix df1(double t, matrix Y, matrix ud1, matrix ud2) {
-	
-	//double a = 0.98, b = 0.63, g = 9.81, VA = 5, PA = 0.75, DB = 36.5665, VB = 1, PB = 1, Fin = 0.01, Tin = 10, TA = 90;
-	//double a = 0.98, b = 0.63, g = 9.81, PA = 1, TA = 90, PB = 1, DB = 0.00365665, Fin = 0.01, Tin = 10, DA = ud2();
 	double a = 0.98, b = 0.63, g = 9.81, PA = 0.75, TA = 90, PB = 1, DB = 0.00365665, Fin = 0.01, Tin = 10, DA = ud2();
-
-
 	matrix dY(3, 1);
-	
 	double FAout = a * b * DA * sqrt(2 * g * Y(0) / PA);
-	if (Y(0) <= 0)
-		FAout = 0;
+	if (Y(0) <= 0) FAout = 0;
 	double FBout = a * b * DB * sqrt(2 * g * Y(1) / PB);
-	if (Y(1) <= 0)
-		FBout = 0;
+	if (Y(1) <= 0) FBout = 0;
 
-	sfadf++;
 	dY(0) = -FAout;
 	dY(1) = FAout + Fin - FBout;
 	dY(2) = Fin / Y(1) * (Tin - Y(2)) + FAout / Y(1) * (TA-Y(2));
-	
-	//cerr << dY(0) << dY(1) << dY(2) << endl;
 
 	return dY;
 }
@@ -123,37 +95,25 @@ matrix fR(matrix x, matrix ud1, matrix ud2) {
 	matrix Y0 = matrix(3, t);
 	matrix* Y = solve_ode(df1,0,1,1000,Y0,ud1,x);
 
+	//zapis VA, VB, TB do pliku -> symulacja
+	//ofstream file;file.open("sym.csv");file<<Y[1];file.close();
+
 	double max_ = Y[1](0.2);
-
-	//zapis -> symulacja
-	ofstream file; file.open("sym.csv");
-	file << Y[1];
-	file.close();
-	//==
-
-	for (int i = 1; i < get_len(Y[0]); i++) {
+	for (int i = 1; i < get_len(Y[0]); i++)
 		if (max_ < Y[1](i, 2))
 			max_ = Y[1](i, 2);
-		/*
-		if (Y[1](i,2) > max_) {
-			max_ = Y[1](i, 2);
-		}
-		*/
-	}
 	y = abs(max_ - 50);
-
 	return y;
 }
 
 template <typename T>
-std::string to_string_with_precision(const T a_value, const int n = 22)
+string to_string_with_precision(const T a_value, const int n = 22)
 {
 	std::ostringstream out;
 	out.precision(n);
 	out << std::fixed << a_value;
 	return out.str();
 }
-
 string stringify(double in) {
 	string s = to_string_with_precision(in);
 	std::replace(s.begin(), s.end(), '.', ',');
@@ -161,97 +121,41 @@ string stringify(double in) {
 }
 
 void testowa_f_celu_a() {
-
-
-
 	ofstream part1("_part1.txt");
 	ofstream part2("_part2.txt");
-
 
 	double x0, d = 1, epsilon = 1e-5, gamma = 1e-11, Nmax = 1000, alpha;
 	random_device R;
 	alpha = 2.2; //1.5, 2.2, 2.9
 	for (int i = 0; i < 1; i++) {
 		//exp
-		cerr << i << " ";
 		x0 = 200.0 * R() / R.max() - 100; //x0 z przedzialu -100 ; 100
-
-		part1 << stringify(x0) << "\t";
 		double* ab_range = expansion(f1, x0, d, alpha, Nmax);
-		double a = *ab_range, b = *++ab_range;
-		a = -100; b = 100;
-		part1 << stringify(a) << "\t";
-		part1 << stringify(b) << "\t";
-		part1 << solution::f_calls << "\t";
-
+		double a = *ab_range, b = *++ab_range;		
+		part1 << stringify(x0) << "\t" << stringify(a) << "\t" << stringify(b) << "\t" << solution::f_calls << "\t"; //zapis do pliku part1
 		solution::clear_calls();
+		//przedzia³ na sztywno
+		//a = -100; b = 100;
 		//fib
-		cerr << "b";
 		solution s_fib = fib(f1, a, b, epsilon);
-		part1 << stringify(m2d(s_fib.x)) << "\t";
-		part1 << stringify(m2d(s_fib.y)) << "\t";
-		part1 << solution::f_calls << endl;
+		part1 << stringify(m2d(s_fib.x)) << "\t" << stringify(m2d(s_fib.y)) << "\t" << solution::f_calls << endl; //zapis do pliku part1
 		solution::clear_calls();
-
-		//cerr << s_fib.y << " vs " << f1(s_fib.x, matrix(0), matrix(0)) << endl;
-
 		//lag
-		cerr << "\n\n\n\n\nc";
 		solution s_lag = lag(f1, a, b, epsilon, gamma, Nmax);
-		part2 << stringify(m2d(s_lag.x)) << "\t";
-		part2 << stringify(m2d(s_lag.y)) << "\t";
-		part2 << solution::f_calls << endl;
+		part2 << stringify(m2d(s_lag.x)) << "\t" << stringify(m2d(s_lag.y)) << "\t" << solution::f_calls << endl;	//zapis do pliku part2
 		solution::clear_calls();
-		cerr << "d\n";
-
 	}
-
-
-
 }
 void problem_rzeczy_b() {
 	double x0, d = 1, epsilon = 1e-4, gamma = 1e-6, Nmax = 1000, alpha = 2;
-
-
-	solution opt_F = fib(fR, 0.0001, 0.01, epsilon);
-	cerr << "fib->\n" << opt_F << endl << endl;
-	//solution::clear_calls();
-
-	//solution opt_L = lag(fR, 0.0001, 0.01, epsilon, gamma, Nmax);
-	//cerr << "lag->\n" << opt_L << endl << endl;
-
-	
-
-}
-
-void lab1_rzeczywiste() {
-
-	double x0, d = 1, epsilon = 1e-5, gamma = 1e-200, Nmax = 100, alpha = 2;
-
-	random_device R;
-	x0 = 99.0 * R() / R.max() + 1; //random x0
-	cerr << "x0=" << x0 << endl;
-
-	double* ab_range = expansion(f1, x0, d, alpha, Nmax);
-	double a = *ab_range, b = *++ab_range;
-	cerr << "expansion -> [" << a << "," << b << "]\n";
-
-	//a = 11, b = 21;
-
-	//fib(fR, a, b, epsilon);
-	solution s_fib = fib(fR, a, b, epsilon);
-	cerr << "fibonacci -> " << endl;
-	cerr << s_fib << endl;
+	//fib
+	solution o_fib = fib(fR, 0.0001, 0.01, epsilon);
+	cerr << "fib->\n" << o_fib << endl << endl;
 	solution::clear_calls();
-
-
-	solution s_lag = lag(fR, a, b, epsilon, gamma, Nmax);
-	cerr << "lagrange  -> " << endl;
-	cerr << s_lag << endl;
-	solution::clear_calls();
-
+	//lag
+	solution o_lag = lag(fR, 0.0001, 0.01, epsilon, gamma, Nmax);
+	cerr << "lag->\n" << o_lag << endl << endl;
 }
-
 
 void lab2() {
 

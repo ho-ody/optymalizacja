@@ -45,13 +45,25 @@ matrix f1_old(matrix x, matrix ud1, matrix ud2) {
 	return matrix(y);
 }
 void lab1_rzeczywiste();
+
+void print_sol(solution in) {
+	cerr << "\tx =       " << m2d(in.x) << endl;
+	cerr << "\ty =       " << m2d(in.y) << endl;
+	cerr << "\tf_calls = " << solution::f_calls << endl;
+}
+void reset_calls() {
+	solution::f_calls = 0;
+	solution::g_calls = 0;
+	solution::H_calls = 0;
+}
+
 void lab1() {
-	lab1_rzeczywiste();
-	return;
+//lab1_rzeczywiste();
+//return;
 	//input data
 	double x0		= 10;
 	double d		= 1;
-	double alpha	= 2;
+	double alpha	= 1.5;
 	double epsilon	= 1e-5;
 	double gamma	= 1e-5;
 	double Nmax		= 1000;
@@ -60,13 +72,21 @@ void lab1() {
 	double* ab_range = expansion(f1, x0, d, alpha, Nmax);
 	double a = *ab_range, b = *++ab_range;
 	cerr << "expansion -> [" << a << "," << b << "]\n";
+	
+	
 	a = -10; b = 1;
 	epsilon = 0.0001;
 	gamma = 1e-7;
-	double fib_v = m2d(fib(f1, a, b, epsilon).x);
-	cerr << "fibonacci -> " << fib_v << endl;
-	double lag_v = m2d(lag(f1, a, b, epsilon, gamma, Nmax).x);
-	cerr << "lagrange  -> " << lag_v << endl;
+	reset_calls();
+	solution temp = fib(f1, a, b, epsilon);
+
+	cerr << "fibonacci -> " << endl;
+	print_sol(temp);
+
+	reset_calls();
+	temp =lag(f1, a, b, epsilon, gamma, Nmax);
+	cerr << "lagrange  -> " << endl;
+	print_sol(temp);
 }
 
 matrix df1(double t, matrix Y, matrix ud1, matrix ud2) {

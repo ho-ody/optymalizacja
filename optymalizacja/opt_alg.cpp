@@ -61,10 +61,12 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		D.fit_fun(ff, ud1, ud2);
 		for (int i = 0; i <= n - 3; ++i)
 		{
-			if (C.fit_fun(ff) < D.fit_fun(ff))
-				B.x = D.x;
+			if (C.y < D.y)
+				//B.x = D.x;
+				B = D;
 			else
-				A.x = C.x;
+				//A.x = C.x;
+				A = C;
 			C.x = B.x - 1.0 * F[n - i - 2] / F[n - i - 1] * (B.x - A.x);
 			D.x = A.x + B.x - C.x;
 			C.fit_fun(ff, ud1, ud2);
@@ -84,44 +86,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-		/*
-		solution A(a), B(b), C((a + b) / 2), D(0.);
-		matrix l, m;
-		while (0x1) {
-			A.fit_fun(ff);
-			B.fit_fun(ff);
-			C.fit_fun(ff);
-			l = A.y * (pow(B.x, 2) - pow(C.x,2)) + B.y * (pow(C.x,2)-pow(A.x,2)) + C.y*(pow(A.x,2)-pow(B.x,2));
-			m = A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x);
-			if (m <= 0)
-				return solution();
-			D.x = 0.5 * l / m;
-			D.fit_fun(ff);
-			if (A.x < C.x && C.x < D.x) {
-				if (D.y < C.y) {
-					A = C;
-					C = D;
-				}
-				else
-					B = D;
-			}
-			else if (A.x < D.x && D.x < C.x) {
-				if (D.y > C.y) {
-					B = C;
-					C = D;
-				}
-				else
-					A = D;
-			}
-			else
-				return solution();
-
-			if (Nmax <= D.f_calls - 3 || A.x - B.x < epsilon || (D.x - C.x > -gamma && D.x - C.x < gamma)) {
-				C.fit_fun(ff);
-				return C;
-			}
-		}
-		*/
 		solution Xopt;
 		Xopt.ud = b - a;
 		solution A(a), B(b), C, D, D_old(a);
@@ -144,7 +108,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			D.fit_fun(ff, ud1, ud2);
 			if (A.x <= D.x && D.x <= C.x)
 			{
-				if (D.y > C.y) {
+				if (D.y < C.y) {
 					B = C;
 					C = D;
 				}
@@ -169,13 +133,13 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			Xopt.ud.add_row((B.x - A.x)());
 			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
 			{
-				Xopt = D;
+				Xopt = C;
 				Xopt.flag = 0;
 				break;
 			}
 			if (solution::f_calls > Nmax)
 			{
-				Xopt = D;
+				Xopt = C;
 				Xopt.flag = 1;
 				break;
 			}

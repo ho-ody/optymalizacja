@@ -1,10 +1,10 @@
 /*********************************************
-Kod stanowi uzupe³nienie materia³ów do æwiczeñ
+Kod stanowi uzupeÂ³nienie materiaÂ³Ã³w do Ã¦wiczeÃ±
 w ramach przedmiotu metody optymalizacji.
-Kod udostêpniony na licencji CC BY-SA 3.0
-Autor: dr in¿. £ukasz Sztangret
+Kod udostÃªpniony na licencji CC BY-SA 3.0
+Autor: dr inÂ¿. Â£ukasz Sztangret
 Katedra Informatyki Stosowanej i Modelowania
-Akademia Górniczo-Hutnicza
+Akademia GÃ³rniczo-Hutnicza
 *********************************************/
 
 #include"opt_alg.h"
@@ -45,8 +45,8 @@ void problem_rzeczy_b();
 void test_zbiez_metod();
 void lab1() {
 	//test_zbiez_metod();	//spradzanie poprawnosci obliczen metody fibbonaciego i lagrangea
-	//testowa_f_celu_a();	//rozwi¹zanie dla funkcji testowej, punkt 5.a. z pdf'a
-	problem_rzeczy_b();		//rozwi¹zanie dla przypadku rzeczywistego, punkt 5.b. z pdf'a
+	//testowa_f_celu_a();	//rozwiÂ¹zanie dla funkcji testowej, punkt 5.a. z pdf'a
+	problem_rzeczy_b();		//rozwiÂ¹zanie dla przypadku rzeczywistego, punkt 5.b. z pdf'a
 }
 void test_zbiez_metod() {
 	//input data
@@ -134,7 +134,7 @@ void testowa_f_celu_a() {
 		double a = *ab_range, b = *++ab_range;		
 		part1 << stringify(x0) << "\t" << stringify(a) << "\t" << stringify(b) << "\t" << solution::f_calls << "\t"; //zapis do pliku part1
 		solution::clear_calls();
-		//przedzia³ na sztywno
+		//przedziaÂ³ na sztywno
 		//a = -100; b = 100;
 		//fib
 		solution s_fib = fib(f1, a, b, epsilon);
@@ -158,7 +158,77 @@ void problem_rzeczy_b() {
 }
 
 void lab2() {
+double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
+	double alphaR = 2, beta = 0.5;
+	matrix s0(2, 1, s);
+	int Nmax = 1000;
 
+	matrix x0 = matrix(2, 1, 0.5);
+	matrix Xs_HJ1 = trans(x0);
+
+	//przyklad1
+	solution optHJ1 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ1);
+	cerr << "przykad1\n";
+	cerr << optHJ1 << endl;
+	solution::clear_calls();
+
+
+	//przyklad2
+	s = 0.5;
+	alphaHJ = 0.5;
+	alphaR = 2;
+	beta = 0.5;
+	epsilon = 1e-3;
+	Nmax = 1000;
+	x0 = matrix(2, 1, 0.75);
+	matrix Xs_HJ2 = trans(x0);
+
+	solution optHJ2 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ2);
+	cerr << "przykad2\n";
+	cerr << optHJ2 << endl;
+	solution::clear_calls();
+	//przyklad3
+	s = 0.25;
+	alphaHJ = 0.5;
+	alphaR = 2;
+	beta = 0.5;
+	epsilon = 1e-3;
+	Nmax = 1000;
+	x0 = matrix(2, 1, 0.75);
+	matrix Xs_HJ3 = trans(x0);
+
+	solution optHJ3 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ3);
+	cerr << "przykad3\n";
+	cerr << optHJ3 << endl;
+	solution::clear_calls();
+	//przyklad4
+	s = 0.25;
+	alphaHJ = 0.25;
+	alphaR = 1.5;
+	beta = 0.125;
+	epsilon = 1e-8;
+	Nmax = 1000;
+	x0 = matrix(2, 1, 1.0);
+	matrix Xs_HJ4 = trans(x0);
+
+	solution optHJ4 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ4);
+	cerr << "przykad4\n";
+	cerr << optHJ4 << endl;
+	solution::clear_calls();
+	//przyklad5
+	s = 0.25;
+	alphaHJ = 0.25;
+	alphaR = 1.5;
+	beta = 0.125;
+	epsilon = 1e-8;
+	Nmax = 1000;
+	x0 = matrix(2, 1, -1.0);
+	matrix Xs_HJ5 = trans(x0);
+
+	solution optHJ5 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ5);
+	cerr << "przykad5\n";
+	cerr << optHJ5 << endl;
+	solution::clear_calls();
 }
 
 void lab3() {

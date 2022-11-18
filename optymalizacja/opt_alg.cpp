@@ -165,8 +165,35 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
-
+		
+		solution XB(x0), XB_old, X;
+		XB.fit_fun(ff, ud1, ud2);
+		while (true)
+		{
+			X = HJ_trial(ff, XB, s, ud1, ud2); //odpalenie etapu probnego
+			if (X.y < XB.y) //sprawdzamy czy etap probny przyniosl poprawe
+			{
+				while (true) //etap roboczy wykonywany co chwile
+				{
+					XB_old = XB;
+					XB = X;
+					X.x = 2 * XB.x - XB_old.x;
+					X.fit_fun(ff, ud1, ud2);
+					X = HJ_trial(ff, X, s, ud2, ud2);
+					if (X.y >= XB.y)
+					break; //przerwanie etapu roboczego
+					if (solution::f_calls > Nmax)
+						return XB;
+				}
+			}
+			else //zmniejszamy dlugosc kroku
+				s *= alpha;
+			if (s<epsilon || solution::f_calls>Nmax) { //warunki stopu
+				XB.flag = 0;
+				return XB;
+			}
+		}
+		Xopt.flag = 1;
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -179,8 +206,28 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 {
 	try
 	{
-		//Tu wpisz kod funkcji
-
+		int n = get_dim(XB); //dlugosc wektora X
+		matrix D = ident_mat(n); //kierunki macierz jednostkowa
+		//Etap probny konczy sie porazka gdy zostajemy na podstawowym punkcie, nastyepnie zmniejszamy kroki az krok bedzie mniejszy
+			// od epsilon
+			//Po zakonczeniu etapu probnego, jesli znalezlismy nowy punkt wykonujemy etap roboczy, odbicie lustrzane starej bazy wzgledem nowej bazy
+			// z punkty X (odbicia) odpalamy etap probny, to co zwroci  porownujemy z punktem symetrii, jesli jest lepszy wykonujemy kolejny raz etap roboczy
+			// jesli jest gorszy anulujemy etap roboczy , wracamy do bazy i rozpoczynamy iteracje 
+		solution X;
+		for (int i = 0; i < n; ++i)
+		{
+			X.x = XB.x + s * D[i];
+			X.fit_fun(ff, ud1, ud2);
+			if (X.y < XB.y)
+				XB = X;
+			else
+			{
+				X.x = XB.x - s * D[i];
+				X.fit_fun(ff, ud1, ud2);
+				if (X.y < XB.y)
+					XB = X;
+			}
+		}
 		return XB;
 	}
 	catch (string ex_info)

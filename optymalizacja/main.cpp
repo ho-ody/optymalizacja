@@ -20,7 +20,7 @@ int main()
 {
 	try
 	{
-		lab1();
+		lab2();
 	}
 	catch (string EX_INFO)
 	{
@@ -40,6 +40,11 @@ matrix f1(matrix x, matrix ud1, matrix ud2) {
 	double y = -cos(0.1 * x()) * exp(-pow(0.1 * x() - 2 * 3.14, 2)) + 0.002 * pow(0.1 * x(), 2);
 	return matrix(y);
 }
+matrix f2(matrix x, matrix ud1, matrix ud2) {
+	double y = pow(x(0), 2) + pow(x(1), 2) - cos(2.5 * 3.14 * x(0)) -cos(2.5 * 3.14 * x(1)) + 2;
+	return matrix(y);
+}
+
 void testowa_f_celu_a();
 void problem_rzeczy_b();
 void test_zbiez_metod();
@@ -160,19 +165,19 @@ void problem_rzeczy_b() {
 void lab2() {
 double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
 	double alphaR = 2, beta = 0.5;
-	matrix s0(2, 1, s);
+	//matrix s01(2, 1, s);
 	int Nmax = 1000;
 
 	matrix x0 = matrix(2, 1, 0.5);
 	matrix Xs_HJ1 = trans(x0);
+	matrix Xs_Rosen1 = trans(x0);
 
 	//przyklad1
 	solution optHJ1 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ1);
-	cerr << "przykad1\n";
-	cerr << optHJ1 << endl;
-	solution::clear_calls();
-
-
+	cerr << "przykad1\nMetoda Hooke'Jeevsa\n" << optHJ1; solution::clear_calls();
+	solution optR1 = Rosen(f2, x0, matrix(2, 1, s), alphaR, beta, epsilon, Nmax, Xs_Rosen1);
+	cerr << "\nMetoda Rosenbrocka\n" << optR1 << endl; solution::clear_calls();
+	
 	//przyklad2
 	s = 0.5;
 	alphaHJ = 0.5;
@@ -182,11 +187,12 @@ double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
 	Nmax = 1000;
 	x0 = matrix(2, 1, 0.75);
 	matrix Xs_HJ2 = trans(x0);
+	matrix Xs_Rosen2 = trans(x0);
 
 	solution optHJ2 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ2);
-	cerr << "przykad2\n";
-	cerr << optHJ2 << endl;
-	solution::clear_calls();
+	cerr << "przykad2\nMetoda Hooke'Jeevsa\n" << optHJ2; solution::clear_calls();
+	solution optR2 = Rosen(f2, x0, matrix(2, 1, s), alphaR, beta, epsilon, Nmax, Xs_Rosen2);
+	cerr << "\nMetoda Rosenbrocka\n" << optR2 << endl; solution::clear_calls();
 	//przyklad3
 	s = 0.25;
 	alphaHJ = 0.5;
@@ -196,11 +202,12 @@ double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
 	Nmax = 1000;
 	x0 = matrix(2, 1, 0.75);
 	matrix Xs_HJ3 = trans(x0);
+	matrix Xs_Rosen3 = trans(x0);
 
 	solution optHJ3 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ3);
-	cerr << "przykad3\n";
-	cerr << optHJ3 << endl;
-	solution::clear_calls();
+	cerr << "przykad3\nMetoda Hooke'Jeevsa\n" << optHJ3; solution::clear_calls();
+	solution optR3 = Rosen(f2, x0, matrix(2, 1, s), alphaR, beta, epsilon, Nmax, Xs_Rosen3);
+	cerr << "\nMetoda Rosenbrocka\n" << optR3 << endl; solution::clear_calls();
 	//przyklad4
 	s = 0.25;
 	alphaHJ = 0.25;
@@ -210,11 +217,12 @@ double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
 	Nmax = 1000;
 	x0 = matrix(2, 1, 1.0);
 	matrix Xs_HJ4 = trans(x0);
+	matrix Xs_Rosen4 = trans(x0);
 
 	solution optHJ4 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ4);
-	cerr << "przykad4\n";
-	cerr << optHJ4 << endl;
-	solution::clear_calls();
+	cerr << "przykad4\nMetoda Hooke'Jeevsa\n" << optHJ4; solution::clear_calls();
+	solution optR4 = Rosen(f2, x0, matrix(2, 1, s), alphaR, beta, epsilon, Nmax, Xs_Rosen4);
+	cerr << "\nMetoda Rosenbrocka\n" << optR4 << endl; solution::clear_calls();
 	//przyklad5
 	s = 0.25;
 	alphaHJ = 0.25;
@@ -224,11 +232,12 @@ double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
 	Nmax = 1000;
 	x0 = matrix(2, 1, -1.0);
 	matrix Xs_HJ5 = trans(x0);
+	matrix Xs_Rosen5 = trans(x0);
 
 	solution optHJ5 = HJ(f2, x0, s, alphaHJ, epsilon, Nmax, Xs_HJ5);
-	cerr << "przykad5\n";
-	cerr << optHJ5 << endl;
-	solution::clear_calls();
+	cerr << "przykad5\nMetoda Hooke'Jeevsa\n" << optHJ5; solution::clear_calls();
+	solution optR5 = Rosen(f2, x0, matrix(2, 1, s), alphaR, beta, epsilon, Nmax, Xs_Rosen5);
+	cerr << "\nMetoda Rosenbrocka\n" << optR5 << endl; solution::clear_calls();
 }
 
 void lab3() {

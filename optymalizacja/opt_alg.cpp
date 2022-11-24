@@ -240,10 +240,68 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution X(x0), Xt; //xt - xtemporary
+		int n = get_dim(X);
+		matrix l(n, 1), p(n, 1), s(s0), D = ident_mat(n); //l-wzgledne przesuniecie, p - macierz przechowujaca ilosc porazek, s - dlugosci krokow, d - macierz kierunkow
+		X.fit_fun(ff, ud1, ud2);
 
-		return Xopt;
+		while (true)
+		{
+			for (int i = 0; i < n; ++i)
+			{
+				Xt.x = X.x + s(i) * D[i];									// [] -> () jd
+				Xt.fit_fun(ff, ud1, ud2);
+				if (Xt.y < X.y)
+				{
+					X = Xt;
+					l(i) += s(i); //dodajemy dlugosc ktora przebylismy		// =  ->  +=
+					s(i) *= alpha; // przypadek gdy poczatkowy krok jest udany
+				}
+				else
+				{
+					++p(i); //zwiekszamy licznik porazek
+					s(i) *= -beta; //zmniejszamy krok
+				}
+			}
+			bool change = true;
+			for (int i = 0; i < n; ++i)
+				if (p(i) == 0 || l(i) == 0)					
+				{
+					change = false; //przypadek w ktorym nie trzeba zmieniac bazy
+						break;
+				}
+			if (change) //przypadek obrotu
+			{
+				//pierwszy kierunek to pierwsza kolumna z macierzy Q podzielona przez dlugosc tej kolumny
+				matrix Q(n, n), v(n, 1);
+				for (int i = 0; i < n; ++i)
+					for (int j = 0; j <= i; ++j)
+						Q(i, j) = l(i);
+				Q = D * Q;
+				v = Q[0] / norm(Q[0]);
+				D.set_col(v, 0);
+				for (int i = 1; i < n; ++i)
+				{
+					matrix temp(n, 1);
+					for (int j = 0; j < i; ++j)
+						temp = temp + trans(Q[i]) * D[j] * D[j];
+					v = (Q[i] - temp) / norm(Q[i] - temp);
+					D.set_col(v, i);
+				}
+				s = s0;
+				l = matrix(n, 1);
+				p = matrix(n, 1);
+			}
+			double max_s = abs(s(0));
+			for (int i = 1; i < n; ++i)
+				if (max_s < abs(s(i)))
+					max_s = abs(s(i));
+			if (max_s<epsilon || solution::f_calls>Nmax) { // warunek stopu
+				//X.fit_fun(ff, ud1, ud2);
+				X.flag = 0;
+				return X;
+			}
+		}
 	}
 	catch (string ex_info)
 	{

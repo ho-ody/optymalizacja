@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="lab.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="ode_solver.h" />
     <ClInclude Include="opt_alg.h" />
@@ -146,6 +147,8 @@
     <ClInclude Include="user_funs.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lab1.cpp" />
+    <ClCompile Include="lab2.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrix.cpp" />
     <ClCompile Include="ode_solver.cpp" />

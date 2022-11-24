@@ -160,6 +160,23 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	}
 }
 
+
+template <typename T>
+string transform(T i) {
+	stringstream ss;
+	ss << i;
+	string s = ss.str();
+	replace(s.begin(), s.end(), '.', ',');
+	s += ";";
+	return s;
+}
+template <typename T>
+string t(T i) {
+	return transform(i);
+}
+
+//ofstream output_HJ("_outputHJ.csv");	//zapis iteracje
+//ofstream output_R("_outputR.csv");	//zapis iteracje
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
@@ -168,6 +185,7 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 		
 		solution XB(x0), XB_old, X;
 		XB.fit_fun(ff, ud1, ud2);
+		//output_HJ << t(XB.x(0)) << t(XB.x(1)) << endl;	//zapis iteracje
 		while (true)
 		{
 			X = HJ_trial(ff, XB, s, ud1, ud2); //odpalenie etapu probnego
@@ -192,6 +210,7 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 				XB.flag = 0;
 				return XB;
 			}
+			//output_HJ << t(XB.x(0)) << t(XB.x(1)) << endl;	//zapis iteracje
 		}
 		Xopt.flag = 1;
 		return Xopt;
@@ -244,7 +263,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 		int n = get_dim(X);
 		matrix l(n, 1), p(n, 1), s(s0), D = ident_mat(n); //l-wzgledne przesuniecie, p - macierz przechowujaca ilosc porazek, s - dlugosci krokow, d - macierz kierunkow
 		X.fit_fun(ff, ud1, ud2);
-
+		//output_R << t(X.x(0)) << t(X.x(1)) << endl;	//zapis iteracje
 		while (true)
 		{
 			for (int i = 0; i < n; ++i)
@@ -301,6 +320,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 				X.flag = 0;
 				return X;
 			}
+			//output_R << t(X.x(0)) << t(X.x(1)) << endl;	//zapis iteracje
 		}
 	}
 	catch (string ex_info)

@@ -80,7 +80,9 @@ matrix solution::fit_fun(matrix(*ff)(matrix, matrix, matrix), matrix ud1, matrix
 	try
 	{
 		++f_calls;
+		//cerr << y << endl;
 		y = ff(x, ud1, ud2);
+		//cerr << y << endl;
 		return y;
 	}
 	catch (string ex_info)

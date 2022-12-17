@@ -93,7 +93,7 @@ matrix& matrix::operator=(const matrix& A)
 	return *this;
 }
 
-matrix matrix::operator[](int nv) const
+matrix matrix::operator[](int nv) const 
 {
 	if (nv >= m || nv < 0)
 		throw string("matrix matrix::operator[](int nv) const:\nnumer kolmuny jest poza zakresem");

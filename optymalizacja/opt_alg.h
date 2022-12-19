@@ -1,7 +1,7 @@
 //Ten plik nie powinien byæ edytowany
 
 #pragma once
-
+#define _l = 32.67 + ((rand() % 200 - 100) / 10000.);
 #include"solution.h"
 
 double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alpha, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);

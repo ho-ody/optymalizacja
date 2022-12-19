@@ -1,5 +1,4 @@
 #pragma once
-
 #include"ode_solver.h"
 
 std::pair<double, double> metoda_ekspansji(double f(double), double x0, double d);

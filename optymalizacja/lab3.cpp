@@ -53,7 +53,7 @@ namespace l3 {
 		y = sin(arg) / arg;
 
 		bool typ_kary = false;
-		if (ud2(1) > 1){
+		if (true){
 			if (-x(0) + 1 > 0)
 				y = y + ud2(0) * pow(-x(0) + 1, 2);
 			if (-x(1) + 1 > 0)
@@ -127,6 +127,8 @@ namespace l3 {
 	}
 	void testowa_f_celu_a() {
 		ofstream output("_output.csv");
+
+		output << "a;x0(0);x0(1);x(0);x(1);r;y;calls\n";
 		double c0 = 1, dc_out = 2, dc_in = 0.5, epsilon = 1e-3;
 		int Nmax = 10000;
 		matrix x0(2, 1);
@@ -139,20 +141,21 @@ namespace l3 {
 			}
 			for (int i = 0; i < 100; i++) {
 				x0 = matrix(4 * rand_mat(2, 1) + 1);
-				output << t(x0(0)) << t(x0(1)) << endl;
-				/*
+				output << a << t(x0(0)) << t(x0(1));// << endl;
+				
 
-				solution optNM1 = pen(f3, x0, c0, dc_in, epsilon, Nmax, a);
+				solution optNM1 = pen(f3, x0, c0, dc_out, epsilon, Nmax, a);
 				output << t(optNM1.x(0)) << t(optNM1.x(1)) << t(norm(optNM1.x)) << t(optNM1.y(0))  << t(optNM1.f_calls);
 				solution::clear_calls();
 				output << endl;
-				*/
+				
 				//dc = 2;
 				/*
-				solution optNM2 = pen(f3, x0, c0, dc, epsilon, Nmax, a);
+				solution optNM2 = pen(f3, x0, c0, dc_in, epsilon, Nmax, a);
 				output << t(optNM2.x(0)) << t(optNM2.x(1)) << t(norm(optNM2.x)) << t(optNM2.y(0)) << t(optNM2.f_calls) << endl;
 				solution::clear_calls();
 				*/
+				
 			}
 		}
 
@@ -243,7 +246,7 @@ namespace l3 {
 	void problem_rzeczywi() {
 		
 		ofstream output("_output_real.csv");
-		double c0 = 1, dc = 4, epsilon = 1e-5;
+		double c0 = 1, dc = 2, epsilon = 1e-5;
 		int Nmax = 10000;
 
 		matrix x0 = 21 * rand_mat(2, 1) - 10;
@@ -252,9 +255,11 @@ namespace l3 {
 		matrix a(0);
 		a = matrix(0);
 
+		
+		x0(0) = 8.23262;
+		x0(1) = 15.5273;
+
 		cerr << x0 << endl << endl;
-		//x0(0) = 0.62;
-		//x0(1) = 22.67;
 		matrix c(1, new double[1]{ c0 });
 		solution opt = pen(fR, x0, c0, dc, epsilon, Nmax, a);
 		cerr << opt << endl;

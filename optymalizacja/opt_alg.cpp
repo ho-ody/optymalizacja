@@ -318,8 +318,8 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c0, double d
 	try {
 		double alpha = 1, beta = 0.5, gamma = 2, delta = 0.5, s = 0.5;
 		solution X(x0), X1;
-		//matrix c(2, new double[2]{ c0, dc }); //wysylane do  fitfun c to waga przy karze, dc do zorientowania jaka kara
-		matrix c(1, new double[1]{ c0 });
+		matrix c(2, new double[2]{ c0, dc }); //wysylane do  fitfun c to waga przy karze, dc do zorientowania jaka kara
+		//matrix c(1, new double[1]{ c0 });
 		while (true)
 		{
 			X1 = sym_NM(ff, X.x, s, alpha, beta, gamma, delta, epsilon, Nmax, ud1, c);
@@ -341,6 +341,7 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c0, double d
 			c(0) *= dc; //obliczenie kary
 			X = X1;
 		}
+		// X1.y _l;
 		return X1;
 	}
 	catch (string ex_info)

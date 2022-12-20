@@ -21,7 +21,7 @@ int main()
 {
 	try
 	{
-		lab3();
+		lab4();
 	}
 	catch (string EX_INFO)
 	{
@@ -55,7 +55,7 @@ void lab3() {
 }
 
 void lab4() {
-
+	l4::test_zbiez_metod();
 }
 
 void lab5(){

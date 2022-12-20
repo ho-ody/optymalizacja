@@ -19,3 +19,8 @@ namespace l3 {
 	void testowa_f_celu_a();
 	void problem_rzeczywi();
 }
+namespace l4 {
+	void test_zbiez_metod();
+	void testowa_f_celu_a();
+	//void problem_rzeczywi();
+}

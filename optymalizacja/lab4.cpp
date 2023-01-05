@@ -33,7 +33,7 @@ namespace l4 {
 		int Nmax = 10000;
 
 		//for (int i = 0; i < 100; i++)
-		matrix x0 = 20 * rand_mat(2, 1) - 10;
+		matrix x0 = 21 * rand_mat(2, 1) - 10;
 		x0(0) = 2.05956;
 		x0(1) = 7.97644;
 
@@ -76,10 +76,52 @@ namespace l4 {
 	}
 
 	void testowa_f_celu_a() {
+		ofstream output("_output.csv");
+		double h0, epsilon = 1e-5;
+		int Nmax = 10000;
+		for (int i = 0; i < 3; i++) {
+			switch (i) {
+			case 0: h0 = 0.05; break;
+			case 1: h0 = 0.12; break;
+			case 2: h0 = -1.0; break;
+			}
+			for (int j = 0; j < 100; j++) {
+				matrix x0 = 20 * rand_mat(2, 1) - 10;
+				output << t(x0(0)) << t(x0(1));
 
+				solution SDopt = SD(f4, gf4, x0, h0, epsilon, Nmax);
+				output << t(SDopt.x(0)) << t(SDopt.x(1)) << t(SDopt.y(0)) << t(SDopt.f_calls) << t(SDopt.g_calls);
+				solution::clear_calls();
 
+				solution CGopt = CG(f4, gf4, x0, h0, epsilon, Nmax);
+				output << t(CGopt.x(0)) << t(CGopt.x(1)) << t(CGopt.y(0)) << t(CGopt.f_calls) << t(CGopt.g_calls);
+				solution::clear_calls();
+
+				solution NTopt = Newton(f4, gf4, hf4, x0, h0, epsilon, Nmax);
+				output << t(NTopt.x(0)) << t(NTopt.x(1)) << t(NTopt.y(0)) << t(NTopt.f_calls) << t(NTopt.g_calls) << t(NTopt.H_calls);
+				solution::clear_calls();
+
+				output << endl;
+			}
+		}
 	}
-
+	void testowa_f_celu_b() {
+		double epsilon = 1e-5;
+		int Nmax = 10000;
+		matrix x0 = 21 * rand_mat(2, 1) - 10;
+		//metoda najszybszego spadku
+		solution SDopt0 = SD(f4, gf4, x0, 0.05, epsilon, Nmax); solution::clear_calls();
+		solution SDopt1 = SD(f4, gf4, x0, 0.12, epsilon, Nmax); solution::clear_calls();
+		solution SDopt2 = SD(f4, gf4, x0, -1.0, epsilon, Nmax); solution::clear_calls();
+		//metoda gradientów sprzê¿onych
+		solution CGopt0 = CG(f4, gf4, x0, 0.05, epsilon, Nmax); solution::clear_calls();
+		solution CGopt1 = CG(f4, gf4, x0, 0.12, epsilon, Nmax); solution::clear_calls();
+		solution CGopt2 = CG(f4, gf4, x0, -1.0, epsilon, Nmax); solution::clear_calls();
+		//metoda newtona
+		solution NTopt0 = Newton(f4, gf4, hf4, x0, 0.05, epsilon, Nmax); solution::clear_calls();
+		solution NTopt1 = Newton(f4, gf4, hf4, x0, 0.12, epsilon, Nmax); solution::clear_calls();
+		solution NTopt2 = Newton(f4, gf4, hf4, x0, -1.0, epsilon, Nmax); solution::clear_calls();
+	}
 
 
 

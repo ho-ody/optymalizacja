@@ -457,6 +457,44 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 	}
 }
 
+
+ofstream output_SD_0_05("_output_SD_0_05.csv");
+ofstream output_SD_0_12("_output_SD_0_12.csv");
+ofstream output_SD_m_zk("_output_SD_m_zk.csv");
+ofstream output_CG_0_05("_output_CG_0_05.csv");
+ofstream output_CG_0_12("_output_CG_0_12.csv");
+ofstream output_CG_m_zk("_output_CG_m_zk.csv");
+ofstream output_Newton_0_05("_output_Newton_0_05.csv");
+ofstream output_Newton_0_12("_output_Newton_0_12.csv");
+ofstream output_Newton_m_zk("_output_Newton_m_zk.csv");
+void write(string x1, string x2, double h0, string method) {
+	if (method == "SD") {
+		if (h0 == 0.05)
+			output_SD_0_05 << x1 << x2 << endl;
+		if (h0 == 0.12)
+			output_SD_0_12 << x1 << x2 << endl;
+		if (h0 < 0)
+			output_SD_m_zk << x1 << x2 << endl;
+	}
+	else if (method == "CG") {
+		if (h0 == 0.05)
+			output_CG_0_05 << x1 << x2 << endl;
+		if (h0 == 0.12)
+			output_CG_0_12 << x1 << x2 << endl;
+		if (h0 < 0)
+			output_CG_m_zk << x1 << x2 << endl;
+	}
+	else if (method == "Newton") {
+		if (h0 == 0.05)
+			output_Newton_0_05 << x1 << x2 << endl;
+		if (h0 == 0.12)
+			output_Newton_0_12 << x1 << x2 << endl;
+		if (h0 < 0)
+			output_Newton_m_zk << x1 << x2 << endl;
+	}
+}
+
+
 solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
@@ -468,6 +506,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		matrix P(2, 2);
 		solution h;
 		double* ab; //przedzial ab
+		write(t(X.x(0)), t(X.x(1)), h0, "SD");
 		while (true)
 		{
 			X.grad(gf); //gradient
@@ -487,6 +526,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			else
 				X1.x = X.x + h0 * d;
 			//(*ud).add_row(trans(X1.x));		//part2
+			write(t(X1.x(0)), t(X1.x(1)), h0, "SD");
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x-X.x) < epsilon)
 			{
 				X1.fit_fun(ff, ud1, ud2);
@@ -514,6 +554,7 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		double* ab, beta;
 		X.grad(gf);
 		d = -X.g;
+		write(t(X.x(0)), t(X.x(1)), h0, "CG");
 		while (true)
 		{
 			if (h0 < 0)
@@ -528,7 +569,9 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			}
 			else
 				X1.x = X.x + h0 * d;
+			
 			//(*ud).add_row(trans(X1.x));	//part2
+			write(t(X1.x(0)), t(X1.x(1)), h0, "CG");
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x - X.x) < epsilon)
 			{
 				X1.fit_fun(ff, ud1);
@@ -558,6 +601,7 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 		matrix P(2, 2);
 		solution h;
 		double* ab;
+		write(t(X.x(0)), t(X.x(1)), h0, "Newton");
 		while (true)
 		{
 			X.grad(gf);
@@ -574,7 +618,8 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 				X1.x = X.x + h.x * d;
 			}
 			else
-				X1.x = X.x + h0 * d;
+				X1.x = X.x + h0 * d;	
+			write(t(X1.x(0)), t(X1.x(1)), h0, "Newton");
 			//(*ud).add_row(trans(X1.x));	//part2
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x - X.x) < epsilon)
 			{

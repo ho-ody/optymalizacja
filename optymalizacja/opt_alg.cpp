@@ -525,8 +525,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			}
 			else
 				X1.x = X.x + h0 * d;
-			//(*ud).add_row(trans(X1.x));		//part2
-			write(t(X1.x(0)), t(X1.x(1)), h0, "SD");
+			//write(t(X1.x(0)), t(X1.x(1)), h0, "SD");
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x-X.x) < epsilon)
 			{
 				X1.fit_fun(ff, ud1, ud2);
@@ -569,8 +568,6 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			}
 			else
 				X1.x = X.x + h0 * d;
-			
-			//(*ud).add_row(trans(X1.x));	//part2
 			write(t(X1.x(0)), t(X1.x(1)), h0, "CG");
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x - X.x) < epsilon)
 			{
@@ -620,7 +617,6 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 			else
 				X1.x = X.x + h0 * d;	
 			write(t(X1.x(0)), t(X1.x(1)), h0, "Newton");
-			//(*ud).add_row(trans(X1.x));	//part2
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x - X.x) < epsilon)
 			{
 				X1.fit_fun(ff,ud1);

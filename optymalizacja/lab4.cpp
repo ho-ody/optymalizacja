@@ -5,11 +5,9 @@ namespace l4 {
 		matrix y(0);
 		if (isnan(ud2(0, 0))) {
 			y = pow(x(0) + 2 * x(1) - 7, 2) + pow(2 * x(0) + x(1) - 5, 2);
-			//cerr << "a";
 		}		
 		else {
 			y = f4(ud2[0] + x * ud2[1], ud1, NAN);
-			//cerr << "b";
 		}		
 		return y;
 	}
@@ -27,7 +25,55 @@ namespace l4 {
 		H(1, 1) = 10;
 		return H;
 	}
-
+	matrix fR(matrix x, matrix ud1, matrix ud2) {
+		int m = 100, n = get_len(x);
+		static matrix X(n, m), Y(1, m);
+		if (solution::f_calls == 1) {
+			ifstream S("XData.txt");
+			S >> X;
+			S.close();
+			S.open("YData.txt");
+			S >> Y;
+			S.close();
+		}
+		double h;
+		matrix y(0);
+		for (int i = 0; i < m; i++)
+		{
+			h = (trans(x) * X[i])();
+			h = 1 / (1 + exp(-h));
+			y = y - Y(0, i) * log(h) - (1 - Y(0, i)) * log(1 - h);
+		}
+		y = y / m;
+		return y;
+	}
+	matrix gfR(matrix x, matrix ud1, matrix ud2) {
+		int m = 100;
+		int n = get_len(x);
+		static matrix X(n, m), Y(1, m);
+		if (solution::g_calls == 1)
+		{
+			ifstream S("XData.txt");
+			S >> X;
+			S.close();
+			S.open("YData.txt");
+			S >> Y;
+			S.close();
+		}
+		double h;
+		matrix g(n, 1);
+		for (int j = 0; j < n; ++j)
+		{
+			for (int i = 0; i < m; ++i)
+			{
+				h = (trans(x) * X[i])();
+				h = 1 / (1 + exp(-h));
+				g(j) = g(j) + X(j, i) * (h - Y(0, i));
+			}
+			g(j) = g(j) / m;
+		}
+		return g;
+	}
 	void test_zbiez_metod() {
 		double epsilon = 1e-5, h0 = 0.05;
 		int Nmax = 10000;
@@ -121,6 +167,42 @@ namespace l4 {
 		solution NTopt0 = Newton(f4, gf4, hf4, x0, 0.05, epsilon, Nmax); solution::clear_calls();
 		solution NTopt1 = Newton(f4, gf4, hf4, x0, 0.12, epsilon, Nmax); solution::clear_calls();
 		solution NTopt2 = Newton(f4, gf4, hf4, x0, -1.0, epsilon, Nmax); solution::clear_calls();
+	}
+
+	ofstream output_real("_output_real.csv");
+	void single_call(double h0) {
+		double epsilon = 1e-5;
+		int Nmax = 10000;
+
+		matrix x0(3, new double[3]{ 0,0,0 });
+		solution solR = CG(fR, gfR, x0, h0, epsilon, Nmax);
+	
+		output_real << t(h0) << t(solR.x(0)) << t(solR.x(1)) << t(solR.x(2)) << t(solR.y(0));
+
+		matrix X(3, 100), Y(1, 100);
+		ifstream S("Xdata.txt");
+		S >> X;
+		S.close();
+		S.open("Ydata.txt");
+		S >> Y;
+		S.close();
+		double p = 0.0;
+		for (int i = 0; i < 100; i++) {
+			h0 = (trans(solR.x) * X[i])();
+			h0 = 1 / (1 + exp(-h0));
+			if ((h0 >= 0.5 && Y[i] == 1) || (h0 < 0.5 && Y[i] == 0)) {
+				p++;
+			}
+		}
+		p = p / 100;
+
+		output_real << t(p) << t(solR.g_calls) << endl;
+		solution::clear_calls();
+	}
+	void problem_rzeczywi() {
+		single_call(0.01);
+		single_call(0.001);
+		single_call(0.0001);
 	}
 
 

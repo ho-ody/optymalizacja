@@ -55,9 +55,10 @@ void lab3() {
 }
 
 void lab4() {
-	//l4::test_zbiez_metod();
+	l4::test_zbiez_metod();
 	//l4::testowa_f_celu_a();
-	l4::testowa_f_celu_b();
+	//l4::testowa_f_celu_b();
+	//l4::problem_rzeczywi();
 }
 
 void lab5(){

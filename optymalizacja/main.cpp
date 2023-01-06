@@ -62,7 +62,8 @@ void lab4() {
 }
 
 void lab5(){
-	l5::test_zbiez_metod();
+	//l5::testowa_f_celu_a();
+	l5::problem_rzeczywi();
 }
 
 void lab6() {

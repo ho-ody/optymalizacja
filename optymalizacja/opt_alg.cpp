@@ -661,13 +661,8 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double 
 			}
 			if (B.x - A.x<epsilon || solution::f_calls>Nmax)
 			{
-				//cerr << A.x << ud1 << ud2 << endl << endl;
 				A.x = (A.x + B.x) / 2;
 				A.fit_fun(ff, ud1, ud2);
-
-				cerr << A.x << ud1[0] << ud1[1] << A.y << endl << endl;
-				//cerr << A.x << ud1 << ud2 << A.y << endl << endl;
-
 				return A;
 			}
 		}
@@ -678,81 +673,45 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double 
 	}
 }
 
-
-int cc = 0;
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
-		int n = get_len(x0); //sprawdzenie wymiarow (get_len)
+		int n = get_len(x0);
 		matrix D = ident_mat(n);
 		matrix A(2,2);
-		solution X, P, h; //P -> punkty rozpoznania po optymalizacji cos tam
-		//h dlugosc kroku bo robimy optymalizacje dla kierunku
+		solution X, P, h;
 		X.x = x0;
-		double* ab; //przedzial do metody ekspansji
+		double* ab;
 		while (true)
 		{	
 			P = X;
 			for (int i = 0; i < n; ++i)
 			{
-				cc++;
-				/*
-				A[0] = P.x; //punkt w ktorym jestesmy aktualnie
-				A[1] = D[i]; //kierunek
-				*/
-				A(0, 0) = P.x(0);				// -1*
-				A(1, 0) = P.x(1);				// -1*
-				A(0, 1) = D[i](0);		//reverse
-				A(1, 1) = D[i](1);		//reverse
+				A(0, 0) = P.x(0);
+				A(1, 0) = P.x(1);
+				A(0, 1) = D[i](0);
+				A(1, 1) = D[i](1);
 
-				//cerr << D << endl << endl;
-		//		cerr << i << ":\n" << D[i] << endl << endl;
-				//cerr << X.x << endl << endl; //!!!!!!!!!!!!!!
-
-				//cerr << A[0] << endl << A[1] << endl << endl;
-				/*
-				if (cc == 2) {
-					A(0, 1) = 0;
-					A(1, 1) = 1;
-				}
-				if (cc == 3) {
-					A(0, 0) = -2;
-					A(1, 0) = -2;
-				}
-				*/
-//!!				cerr << A[0] << endl << A[1] << endl << endl;
 				ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, A);
-				//cerr << ab[0] << " -> " << ab[1] << endl << endl;
-	//			cerr << P.x << endl << A[0] << endl << A[1] << endl << endl;
-				//cerr << A[0] << endl << A[1] << endl << endl;
-				cerr << ab[0] << "->" << ab[1] << "," << epsilon << "," << Nmax << "," << ud1[0] << ud1[1] << endl << endl;
-				//cerr << ab[0] << "->" << ab[1] << "," << epsilon << "," << Nmax << "," << ud1 << endl << endl;
+
 				h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, A);
-				//cerr << h.y << endl << endl;
-				cerr << h << endl << endl;
 				P.x = P.x + h.x * D[i];
-				//wykonalismy n optymalizacji wzdluz kierunku macierzy D, i poprostu przesuwamy punkt P
-			} //po wyjsciu z petli mamy Pn, wiec trzeba sprawdzic kryterium stopu.
+			}
 			if (norm(X.x - P.x) < epsilon || solution::f_calls > Nmax)
 			{
-				P.fit_fun(ff, ud1); //wtedy koniec
-				return P; //Zwracamy P bedace rozwiazaniem
+				P.fit_fun(ff, ud1);
+				return P;
 			}
-			//jak kryterium stopu nie zadzialalo to musimy przenumerowac te cos tam
-			//n - 1 bo ostatni kierunek liczymy inaczej
 			for (int i = 0; i < n - 1; ++i)
-				D.set_col(D[i + 1], i); //d1 = stare d2 | d2 = stare d3 | dn-1 = stare dn
-			D.set_col(P.x - X.x, n - 1); //ostatni punkt wstawiany inaczej => Dn = Pn - P0, gdzie P0 to poprostu X
-			//optymalizacja w tym jednym kierunku ostatnim
-			/*
-			A[0] = P.x;
-			A[1] = D[n - 1];
-			*/
-			A(0, 0) = P.x(0);				// -1*
-			A(1, 0) = P.x(1);				// -1*
-			A(0, 1) = D[n-1](0);		//reverse
-			A(1, 1) = D[n-1](1);		//reverse
+				D.set_col(D[i + 1], i); 
+			D.set_col(P.x - X.x, n - 1); 
+
+			A(0, 0) = P.x(0);				
+			A(1, 0) = P.x(1);				
+			A(0, 1) = D[n-1](0);		
+			A(1, 1) = D[n-1](1);	
+
 			ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, A);
 			h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, A);
 			X.x = P.x + h.x * D[n - 1];

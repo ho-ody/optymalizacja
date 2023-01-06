@@ -457,7 +457,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 	}
 }
 
-
+/*
 ofstream output_SD_0_05("_output_SD_0_05.csv");
 ofstream output_SD_0_12("_output_SD_0_12.csv");
 ofstream output_SD_m_zk("_output_SD_m_zk.csv");
@@ -493,7 +493,7 @@ void write(string x1, string x2, double h0, string method) {
 			output_Newton_m_zk << x1 << x2 << endl;
 	}
 }
-
+*/
 
 solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, matrix), matrix x0, double h0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
@@ -506,7 +506,7 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		matrix P(2, 2);
 		solution h;
 		double* ab; //przedzial ab
-		write(t(X.x(0)), t(X.x(1)), h0, "SD");
+		//write(t(X.x(0)), t(X.x(1)), h0, "SD");
 		while (true)
 		{
 			X.grad(gf); //gradient
@@ -553,7 +553,7 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 		double* ab, beta;
 		X.grad(gf);
 		d = -X.g;
-		write(t(X.x(0)), t(X.x(1)), h0, "CG");
+		//write(t(X.x(0)), t(X.x(1)), h0, "CG");
 		while (true)
 		{
 			if (h0 < 0)
@@ -568,7 +568,7 @@ solution CG(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 			}
 			else
 				X1.x = X.x + h0 * d;
-			write(t(X1.x(0)), t(X1.x(1)), h0, "CG");
+			//write(t(X1.x(0)), t(X1.x(1)), h0, "CG");
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x - X.x) < epsilon)
 			{
 				X1.fit_fun(ff, ud1);
@@ -598,7 +598,7 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 		matrix P(2, 2);
 		solution h;
 		double* ab;
-		write(t(X.x(0)), t(X.x(1)), h0, "Newton");
+		//write(t(X.x(0)), t(X.x(1)), h0, "Newton");
 		while (true)
 		{
 			X.grad(gf);
@@ -616,7 +616,7 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 			}
 			else
 				X1.x = X.x + h0 * d;	
-			write(t(X1.x(0)), t(X1.x(1)), h0, "Newton");
+			//write(t(X1.x(0)), t(X1.x(1)), h0, "Newton");
 			if (solution::f_calls > Nmax || solution::g_calls > Nmax || norm(X1.x - X.x) < epsilon)
 			{
 				X1.fit_fun(ff,ud1);
@@ -661,8 +661,13 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double 
 			}
 			if (B.x - A.x<epsilon || solution::f_calls>Nmax)
 			{
+				//cerr << A.x << ud1 << ud2 << endl << endl;
 				A.x = (A.x + B.x) / 2;
 				A.fit_fun(ff, ud1, ud2);
+
+				cerr << A.x << ud1[0] << ud1[1] << A.y << endl << endl;
+				//cerr << A.x << ud1 << ud2 << A.y << endl << endl;
+
 				return A;
 			}
 		}
@@ -673,14 +678,85 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double 
 	}
 }
 
+
+int cc = 0;
 solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		int n = get_len(x0); //sprawdzenie wymiarow (get_len)
+		matrix D = ident_mat(n);
+		matrix A(2,2);
+		solution X, P, h; //P -> punkty rozpoznania po optymalizacji cos tam
+		//h dlugosc kroku bo robimy optymalizacje dla kierunku
+		X.x = x0;
+		double* ab; //przedzial do metody ekspansji
+		while (true)
+		{	
+			P = X;
+			for (int i = 0; i < n; ++i)
+			{
+				cc++;
+				/*
+				A[0] = P.x; //punkt w ktorym jestesmy aktualnie
+				A[1] = D[i]; //kierunek
+				*/
+				A(0, 0) = P.x(0);				// -1*
+				A(1, 0) = P.x(1);				// -1*
+				A(0, 1) = D[i](0);		//reverse
+				A(1, 1) = D[i](1);		//reverse
 
-		return Xopt;
+				//cerr << D << endl << endl;
+		//		cerr << i << ":\n" << D[i] << endl << endl;
+				//cerr << X.x << endl << endl; //!!!!!!!!!!!!!!
+
+				//cerr << A[0] << endl << A[1] << endl << endl;
+				/*
+				if (cc == 2) {
+					A(0, 1) = 0;
+					A(1, 1) = 1;
+				}
+				if (cc == 3) {
+					A(0, 0) = -2;
+					A(1, 0) = -2;
+				}
+				*/
+//!!				cerr << A[0] << endl << A[1] << endl << endl;
+				ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, A);
+				//cerr << ab[0] << " -> " << ab[1] << endl << endl;
+	//			cerr << P.x << endl << A[0] << endl << A[1] << endl << endl;
+				//cerr << A[0] << endl << A[1] << endl << endl;
+				cerr << ab[0] << "->" << ab[1] << "," << epsilon << "," << Nmax << "," << ud1[0] << ud1[1] << endl << endl;
+				//cerr << ab[0] << "->" << ab[1] << "," << epsilon << "," << Nmax << "," << ud1 << endl << endl;
+				h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, A);
+				//cerr << h.y << endl << endl;
+				cerr << h << endl << endl;
+				P.x = P.x + h.x * D[i];
+				//wykonalismy n optymalizacji wzdluz kierunku macierzy D, i poprostu przesuwamy punkt P
+			} //po wyjsciu z petli mamy Pn, wiec trzeba sprawdzic kryterium stopu.
+			if (norm(X.x - P.x) < epsilon || solution::f_calls > Nmax)
+			{
+				P.fit_fun(ff, ud1); //wtedy koniec
+				return P; //Zwracamy P bedace rozwiazaniem
+			}
+			//jak kryterium stopu nie zadzialalo to musimy przenumerowac te cos tam
+			//n - 1 bo ostatni kierunek liczymy inaczej
+			for (int i = 0; i < n - 1; ++i)
+				D.set_col(D[i + 1], i); //d1 = stare d2 | d2 = stare d3 | dn-1 = stare dn
+			D.set_col(P.x - X.x, n - 1); //ostatni punkt wstawiany inaczej => Dn = Pn - P0, gdzie P0 to poprostu X
+			//optymalizacja w tym jednym kierunku ostatnim
+			/*
+			A[0] = P.x;
+			A[1] = D[n - 1];
+			*/
+			A(0, 0) = P.x(0);				// -1*
+			A(1, 0) = P.x(1);				// -1*
+			A(0, 1) = D[n-1](0);		//reverse
+			A(1, 1) = D[n-1](1);		//reverse
+			ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, A);
+			h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, A);
+			X.x = P.x + h.x * D[n - 1];
+		}
 	}
 	catch (string ex_info)
 	{

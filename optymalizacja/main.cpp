@@ -67,5 +67,6 @@ void lab5(){
 }
 
 void lab6() {
-	l6::testowa_f_celu_a();
+	//l6::testowa_f_celu_a();
+	l6::problem_rzeczywi();
 }

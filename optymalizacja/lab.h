@@ -35,5 +35,5 @@ namespace l6 {
 	void testowa_f_celu_a();
 	//void testowa_f_celu_a();
 	//void testowa_f_celu_b();
-	//void problem_rzeczywi();
+	void problem_rzeczywi();
 }

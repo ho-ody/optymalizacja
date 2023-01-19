@@ -727,10 +727,100 @@ solution EA(matrix(*ff)(matrix, matrix, matrix), int N, matrix limits, int mi, i
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		solution* P = new solution[mi + lambda];
+		solution* Pm = new solution[mi];
+		random_device rd;
+		default_random_engine gen;
+		gen.seed(static_cast<unsigned int>(chrono::system_clock::now().time_since_epoch().count()));
+		normal_distribution<double> distr(0.0, 1.0);
+		matrix IFF(mi, 1), temp(N, 2);
+		double r, s, s_IFF;
+		double tau = pow(2 * N, -0.5), tau1 = pow(2 * pow(N, 0.5), -0.5);
+		int j_min;
+		for (int i = 0; i < mi; ++i)
+		{
+			P[i].x = matrix(N, 2);
+			for (int j = 0; j < N; ++j)
+			{
+				P[i].x(j, 0) = (limits(j, 1) - limits(j, 0)) * rand_mat(1, 1)() + limits(j, 0);
+				P[i].x(j, 1) = sigma0(j);
+			}
+			P[i].fit_fun(ff, ud1, ud2);
+			if (P[i].y < epsilon)
+				return P[i];
+		}
+		while (true)
+		{
+			s_IFF = 0; //suma przystosowan
+			for (int i = 0; i < mi; ++i)
+			{
+				IFF(i) = 1 / P[i].y();
+				s_IFF += IFF(i);
+			}
+			//losowanie osobnikow
+			for (int i = 0; i < lambda; ++i)
+			{
+				r = rand_mat(1, 1)() * s_IFF; //liczba losowa
+				s = 0;  //suma czastkowa
+				for (int j = 0; j < mi; ++j) //dodawanie kolejnych  rozw
+				{
+					s += IFF(j);
+					if (r <= s)
+					{
+						P[mi + i] = P[j];
+						break;
+					}
+				}
+			}
 
-		return Xopt;
+			//selekcja <=========================>
+
+
+			for (int i = 0; i < lambda; ++i)
+			{
+				r = distr(gen);
+				for (int j = 0; j < N; ++j)
+				{
+					P[mi + i].x(j, 1) *= exp(tau1 * r + tau * distr(gen));
+					P[mi + i].x(j, 0) += P[mi + i].x(j, 1) * distr(gen);
+				}
+			}
+
+			//mutacja <=========================================>
+
+			for (int i = 0; i < lambda; i += 2)
+			{
+				r = rand_mat(1, 1)();
+				temp = P[mi + i].x; //zapamietujemy kopie bedaca rodzicem
+				P[mi + i].x = r * P[mi + i].x + (1 - r) * P[mi + i + 1].x;
+				P[mi + i + 1].x = r * P[mi + i + 1].x + (1 - r) * temp; //zamiana na potomkow 
+			}
+
+			//krzyzowanie <======================================================>
+
+			//zamiana populacji i wybor najlepszych
+			for (int i = 0; i < lambda; ++i)
+			{
+				P[mi + i].fit_fun(ff, ud1, ud2);
+				if (P[mi + 1].y < epsilon)
+					return P[mi + i];
+			}
+			for (int i = 0; i < mi; ++i)
+			{
+				j_min = 0;       //najlepszy w  iteracji  zerowej                                                                                                                                                                                                                                                                                                   
+				for (int j = 1; j < mi + lambda; ++j)
+					if (P[j_min].y > P[j].y)
+						j_min = j;
+				Pm[i] = P[j_min];
+				P[j_min].y = 1e10;
+			}
+
+			//sprawdzanie Nmax
+			for (int i = 0; i < mi; ++i)
+				P[i] = Pm[i];
+			if (solution::f_calls > Nmax)
+				return P[0];
+		}
 	}
 	catch (string ex_info)
 	{

@@ -21,7 +21,7 @@ int main()
 {
 	try
 	{
-		lab5();
+		lab6();
 	}
 	catch (string EX_INFO)
 	{
@@ -67,5 +67,5 @@ void lab5(){
 }
 
 void lab6() {
-
+	l6::testowa_f_celu_a();
 }
